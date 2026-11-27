@@ -1,34 +1,42 @@
 name: locker status
 on:
   schedule:
-    - cron: "*/10 * * * *"
+    - cron: "17 */3 * * *"
   workflow_dispatch:
 permissions:
   contents: write
-concurrency: status
+  actions: write
+concurrency:
+  group: status
+  cancel-in-progress: false
 jobs:
   read:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 330
     steps:
       - uses: actions/checkout@v4
       - name: previous status
         run: |
           git fetch origin status --depth=1 2>/dev/null && git show FETCH_HEAD:status.json > prev.json || true
-      - name: read admin page
-        id: read
+      - name: read every 10 minutes for 5 hours
         env:
           TBOX_ID: ${{ secrets.TBOX_ID }}
           TBOX_PW: ${{ secrets.TBOX_PW }}
+          PUSH_URL: https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git
         run: |
           pip -q install requests
-          python scraper.py
-      - name: publish
-        if: steps.read.outputs.changed == 'true'
-        run: |
-          mkdir out && cp status.json out/ && cd out
-          git init -q -b status
-          git config user.name "status-bot"
-          git config user.email "status-bot@users.noreply.github.com"
-          git add status.json && git commit -qm "status"
-          git push -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" status
+          for i in $(seq 1 30); do
+            : > flag.txt
+            if GITHUB_OUTPUT=flag.txt python scraper.py && grep -q 'changed=true' flag.txt; then
+              rm -rf pub && mkdir pub && cp status.json pub/
+              if (cd pub && git init -q -b status && git config user.name "status-bot" && git config user.email "status-bot@users.noreply.github.com" && git add status.json && git commit -qm "status" && git push -qf "$PUSH_URL" status); then
+                cp status.json prev.json
+              fi
+            fi
+            if [ "$i" -lt 30 ]; then sleep 600; fi
+          done
+      - name: start the next round
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run status.yml --repo "${{ github.repository }}" --ref main
