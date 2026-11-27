@@ -175,7 +175,7 @@ function show(){var k=pick();r.setAttribute("data-l",k);r.lang=({en:"en",ja:"ja"
 window.addEventListener("hashchange",show);show();})();
 
 (function(){var h=location.hostname,p=location.pathname.split("/")[1];if(!/\.github\.io$/.test(h)||!p)return;
-fetch("https://raw.githubusercontent.com/"+h.split(".")[0]+"/"+p+"/status/status.json",{cache:"no-store"}).then(function(r){return r.json()}).then(function(d){
+fetch("https://raw.githubusercontent.com/"+h.split(".")[0]+"/"+p+"/refs/heads/status/status.json",{cache:"no-store"}).then(function(r){return r.json()}).then(function(d){
 if(!d||!d.sizes||Date.now()/1000-d.updated>2700)return;var any=false,t=new Date(d.updated*1000),hm=("0"+t.getHours()).slice(-2)+":"+("0"+t.getMinutes()).slice(-2);
 [].forEach.call(document.querySelectorAll("main"),function(m){
 [].forEach.call(m.querySelectorAll("[data-size]"),function(c){var v=d.sizes[c.getAttribute("data-size")];if(!v)return;if(v!="full")any=true;
