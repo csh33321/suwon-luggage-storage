@@ -42,6 +42,7 @@ h1{margin:0;font:700 clamp(36px,8vw,58px)/1.04 var(--display);letter-spacing:-.0
 .st{display:inline-block;padding:3px 10px;border-radius:999px;font-size:14px;font-weight:600;color:#fff;white-space:nowrap}
 .st-ok{background:var(--ok)}.st-few{background:var(--few)}.st-full{background:var(--fullc)}
 .asof{white-space:nowrap}
+.asof:not([hidden]){display:block;margin-top:2px}
 :lang(ko){word-break:keep-all;overflow-wrap:break-word}
 p,li,dd,h1,h3{text-wrap:pretty}
 .chips li:not(.live):nth-child(2){background:var(--tag);border-color:var(--tag);color:var(--tag-ink);font-weight:600}
@@ -57,7 +58,7 @@ tbody tr:last-child>*{border-bottom:0}
 .sz{display:inline-block;min-width:34px;margin-right:12px;padding:2px 0;text-align:center;background:var(--tag);color:var(--tag-ink);border-radius:4px;font:700 15px/1.4 var(--display);letter-spacing:.04em}
 .won{text-align:right;font:700 28px/1 var(--display);font-variant-numeric:tabular-nums;white-space:nowrap}
 .cnt{text-align:right;color:var(--muted);font-variant-numeric:tabular-nums}
-.note{margin:14px 0 0;color:var(--muted);font-size:15.5px;max-width:65ch}
+.note{margin:14px 0 0;color:var(--muted);font-size:15.5px}
 .steps{list-style:none;margin:0;padding:0;display:grid;gap:18px}
 .steps li{display:flex;gap:16px;align-items:flex-start}
 .n{flex:none;width:36px;height:36px;display:grid;place-items:center;border:2px solid var(--ink);border-radius:50%;font:700 19px/1 var(--display)}
