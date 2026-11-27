@@ -40,12 +40,16 @@ def levels(free):
 def main():
     s = requests.Session()
     s.headers["User-Agent"] = "Mozilla/5.0"
-    s.post(BASE + "Member/Login.php",
-           data={"UserID": os.environ["TBOX_ID"], "UserPW": os.environ["TBOX_PW"]},
-           timeout=30)
-    free = parse(text(s.get(BASE, params={"idx": "Control_Integrate"}, timeout=30)))
+    s.get(BASE + "Member/Login.php", timeout=30)
+    s.post(BASE + "Member/login_in.php",
+           data={"UserID": os.environ["TBOX_ID"].strip(), "UserPW": os.environ["TBOX_PW"].strip(),
+                 "idSave": "0", "passwordSave": "0"},
+           headers={"Referer": BASE + "Member/Login.php"}, timeout=30)
+    html = text(s.get(BASE, params={"idx": "Control_Integrate"}, timeout=30))
+    free = parse(html)
     if sorted(free) != list(range(1, 58)):
-        sys.exit(f"expected lockers 1-57, read {len(free)}; nothing written")
+        why = "login not accepted" if ("Login.php" in html or "UserPW" in html) else "page layout changed"
+        sys.exit(f"expected lockers 1-57, read {len(free)} ({why}, {len(html)} chars); nothing written")
     new = {"updated": int(time.time()), "sizes": levels(free)}
     try:
         old = json.load(open("prev.json"))
