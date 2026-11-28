@@ -42,6 +42,9 @@ h1{margin:0;font:700 clamp(36px,8vw,58px)/1.04 var(--display);letter-spacing:-.0
 .st{display:inline-block;padding:3px 10px;border-radius:999px;font-size:14px;font-weight:600;color:#fff;white-space:nowrap}
 .st-ok{background:var(--ok)}.st-few{background:var(--few)}.st-full{background:var(--fullc)}
 .asof{white-space:nowrap}
+.map .c.used,.lg .c.used{background:var(--line);color:var(--muted);text-decoration:line-through;opacity:.8}
+.lg{margin:10px 0 0;display:flex;align-items:center;gap:8px;font-size:14px;color:var(--muted)}
+.lg .sw{width:18px;height:18px;flex:none}
 .asof:not([hidden]){display:block;margin-top:2px}
 :lang(ko){word-break:keep-all;overflow-wrap:break-word}
 p,li,dd,h1,h3{text-wrap:pretty}
@@ -213,6 +216,6 @@ if(!d||!d.sizes||Date.now()/1000-d.updated>2700)return;var any=false,t=new Date(
 c.innerHTML='<span class="st st-'+v+'">'+m.getAttribute("data-"+v)+"</span>";});
 m.querySelector(".cnth").textContent=m.getAttribute("data-now");
 var a=m.querySelector(".asof");a.textContent=m.getAttribute("data-upd")+" "+hm;a.hidden=false;
-if(any)m.querySelector(".live").hidden=false;});}).catch(function(){});})();
+if(any)m.querySelector(".live").hidden=false;if(d.u){var U=d.u;[].forEach.call(m.querySelectorAll(".map .c"),function(c){var n=parseInt(c.textContent,10);if(n)c.classList.toggle("used",U.indexOf(n)>=0);});[].forEach.call(m.querySelectorAll("[data-size]"),function(c){var s=c.querySelector(".st");if(s)s.textContent+=" · "+m.querySelectorAll(".map .c.c"+c.getAttribute("data-size")+":not(.used)").length;});var lg=m.querySelector(".lg");if(!lg){lg=document.createElement("p");lg.className="lg";m.querySelector(".map").insertAdjacentElement("afterend",lg);}lg.innerHTML='<span class="c used sw"></span>'+({en:"In use",ja:"使用中",zh:"使用中",ko:"사용 중",th:"ใช้งานอยู่",vi:"Đang dùng",id:"Terpakai"})[m.getAttribute("data-lang")]+" "+U.length+" / 57";}});}).catch(function(){});})();
 </script>
 </body></html>
