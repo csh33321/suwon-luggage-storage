@@ -1,5 +1,5 @@
 """Reads the T-BOX admin status page and publishes status.json with a per-size
-availability level. No locker numbers, counts or admin details are published.
+availability level and the numbers of the lockers in use. No admin details.
 Runs as a loop: reads every READ_EVERY seconds for RUN_FOR seconds."""
 import json, os, re, shutil, subprocess, sys, time
 import requests
@@ -33,6 +33,10 @@ def parse(html):
             out[int(cells[0])] = "미사용" in cells[2]
     return out
 
+def used(free):
+    """Locker numbers that are in use right now."""
+    return sorted(n for n, is_free in free.items() if not is_free)
+
 def levels(free):
     res = {}
     for size, nums in SIZES.items():
@@ -52,7 +56,7 @@ def read(s):
     for attempt in (1, 2):
         free = parse(text(s.get(BASE, params={"idx": "Control_Integrate"}, timeout=30)))
         if sorted(free) == list(range(1, 58)):
-            return levels(free)
+            return levels(free), used(free)
         if attempt == 1:
             login(s)
     raise RuntimeError(f"expected lockers 1-57, read {len(free)}")
@@ -80,13 +84,14 @@ def main():
     end, ok = time.time() + RUN_FOR, 0
     while True:
         try:
-            sizes = read(s)
+            sizes, in_use = read(s)
             now = int(time.time())
-            if sizes != last.get("sizes") or now - last.get("updated", 0) >= HEARTBEAT:
-                status = {"updated": now, "sizes": sizes}
+            if (sizes != last.get("sizes") or in_use != last.get("u")
+                    or now - last.get("updated", 0) >= HEARTBEAT):
+                status = {"updated": now, "sizes": sizes, "u": in_use}
                 publish(status)
                 last = status
-                print(time.strftime("%H:%M:%S"), "published", sizes, flush=True)
+                print(time.strftime("%H:%M:%S"), "published", sizes, len(in_use), "in use", flush=True)
             ok += 1
         except Exception as e:
             print(time.strftime("%H:%M:%S"), "read failed:", type(e).__name__, flush=True)
